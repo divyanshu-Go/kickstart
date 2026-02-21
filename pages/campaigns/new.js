@@ -1,3 +1,4 @@
+// pages/campaigns/new.js
 import { useState } from "react";
 import { useRouter } from "next/router";
 import web3 from "../../ethereum/web3";

@@ -1,4 +1,4 @@
-//
+// ethereum/factory.js
 import web3 from './web3';
 import Factory from './build/CampaignFactory.json';
 

@@ -1,3 +1,5 @@
+// pages/campaigns/[address]/index.js
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import getCampaign from "../../../ethereum/campaign";
