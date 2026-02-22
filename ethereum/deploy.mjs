@@ -7,8 +7,10 @@ import path from 'path';
 
 // 1️⃣ Load compiled contract from build folder
 const __dirname = path.resolve();
+const buildPath = path.resolve(__dirname, 'ethereum', 'build', 'CampaignFactory.json');
+
 const { abi, evm } = JSON.parse(
-  readFileSync(path.resolve(__dirname, 'build', 'CampaignFactory.json'), 'utf8')
+  readFileSync(buildPath, 'utf8')
 );
 
 const mnemonic = "away gun predict festival tide pledge coffee trophy tribe normal rocket noble";
