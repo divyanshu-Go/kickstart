@@ -4,12 +4,23 @@ import { useRouter } from "next/router";
 import {
   ArrowLeft, AlignLeft, Wallet, MapPin, ChevronRight,
   AlertCircle, Loader2, CheckCircle2, Info, Users,
-  ShieldCheck, Rocket
+  ShieldCheck, Rocket, Link as LinkIcon, Tag
 } from "lucide-react";
 import getCampaign from "../../../../ethereum/campaign";
 import web3 from "../../../../ethereum/web3";
 import Layout from "../../../../component/Layout";
 import styles from "../../../../styles/NewRequest.module.css";
+
+const REQUEST_TYPES = ["Equipment", "Marketing", "Development", "Operations", "Research", "Other"];
+
+const REQUEST_TYPE_CLASS = {
+  Equipment:   "cat-tech",
+  Marketing:   "cat-art",
+  Development: "cat-tech",
+  Operations:  "cat-other",
+  Research:    "cat-education",
+  Other:       "cat-other",
+};
 
 function weiToEth(wei) {
   if (!wei || isNaN(wei)) return null;
@@ -17,20 +28,39 @@ function weiToEth(wei) {
   catch { return null; }
 }
 
+function isValidAddress(addr) {
+  return /^0x[0-9a-fA-F]{40}$/.test(addr);
+}
+
 export default function NewRequestPage() {
   const router = useRouter();
   const { address } = router.query;
 
-  const [form, setForm] = useState({ description: "", value: "", recipient: "" });
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState("");
-  const [success, setSuccess]   = useState(false);
+  const [form, setForm] = useState({
+    description: "",
+    value:       "",
+    recipient:   "",
+    proofLink:   "",
+    requestType: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState("");
+  const [success, setSuccess] = useState(false);
 
-  const set = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }));
+  const set = (field) => (e) => {
+    setError("");
+    setForm(prev => ({ ...prev, [field]: e.target.value }));
+  };
 
-  const isValidAddress = (addr) => /^0x[0-9a-fA-F]{40}$/.test(addr);
-  const isValid = form.description && form.value && Number(form.value) > 0
-                  && form.recipient && isValidAddress(form.recipient);
+  const recipientValid   = !form.recipient || isValidAddress(form.recipient);
+  const recipientInvalid = form.recipient  && !isValidAddress(form.recipient);
+  const recipientOk      = form.recipient  && isValidAddress(form.recipient);
+
+  const isValid =
+    form.description &&
+    form.value && Number(form.value) > 0 &&
+    form.recipient && isValidAddress(form.recipient) &&
+    form.requestType;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +71,13 @@ export default function NewRequestPage() {
     try {
       const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
       await getCampaign(address).methods
-        .createRequest(form.description.trim(), form.value, form.recipient)
+        .createRequest(
+          form.description.trim(),
+          form.value,
+          form.recipient,
+          form.proofLink.trim(),
+          form.requestType,
+        )
         .send({ from: accounts[0] });
 
       setSuccess(true);
@@ -53,16 +89,14 @@ export default function NewRequestPage() {
   };
 
   const ethPreview = weiToEth(form.value);
-  const recipientValid   = !form.recipient || isValidAddress(form.recipient);
-  const recipientInvalid = form.recipient && !isValidAddress(form.recipient);
 
   return (
     <Layout>
       <div className={styles.page}>
 
-        {/* ── Back ── */}
-        <button className={styles.back} onClick={() => router.push(`/campaigns/${address}/requests`)}>
-          <ArrowLeft size={16} /> Back to Requests
+        <button className={styles.back}
+          onClick={() => router.push(`/campaigns/${address}/requests`)}>
+          <ArrowLeft size={16}/> Back to Requests
         </button>
 
         <div className={styles.layout}>
@@ -71,7 +105,7 @@ export default function NewRequestPage() {
           <div className={styles.formCol}>
             <div className={styles.formHeader}>
               <div className={styles.iconWrap}>
-                <AlignLeft size={20} strokeWidth={2} />
+                <AlignLeft size={20} strokeWidth={2}/>
               </div>
               <div>
                 <h1 className={styles.heading}>New Spending Request</h1>
@@ -81,20 +115,33 @@ export default function NewRequestPage() {
 
             <form onSubmit={handleSubmit} className={styles.form}>
 
+              {/* Request type */}
+              <div className={styles.field}>
+                <label className={styles.label}>
+                  <Tag size={14}/> Request Type <span className={styles.req}>*</span>
+                </label>
+                <div className={styles.typeGrid}>
+                  {REQUEST_TYPES.map(t => (
+                    <button key={t} type="button"
+                      className={`${styles.typeBtn} ${form.requestType === t ? styles.typeBtnActive : ""}`}
+                      onClick={() => setForm(p => ({ ...p, requestType: t }))}>
+                      <span className={`badge ${REQUEST_TYPE_CLASS[t]}`}>{t}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Description */}
               <div className={styles.field}>
                 <label className={styles.label}>
-                  <AlignLeft size={14} />
-                  Description <span className={styles.req}>*</span>
+                  <AlignLeft size={14}/> Description <span className={styles.req}>*</span>
                 </label>
                 <textarea
                   className={styles.textarea}
                   placeholder="What will these funds be used for? Be specific — contributors will vote based on this."
                   value={form.description}
                   onChange={set("description")}
-                  rows={4}
-                  maxLength={500}
-                  required
+                  rows={4} maxLength={500} required
                 />
                 <span className={styles.charCount}>{form.description.length}/500</span>
               </div>
@@ -102,48 +149,39 @@ export default function NewRequestPage() {
               {/* Amount */}
               <div className={styles.field}>
                 <label className={styles.label}>
-                  <Wallet size={14} />
-                  Amount to Withdraw <span className={styles.req}>*</span>
+                  <Wallet size={14}/> Amount to Withdraw <span className={styles.req}>*</span>
                 </label>
                 <div className={styles.inputRow}>
                   <input
                     className={`${styles.input} ${styles.inputFlex}`}
-                    type="number"
-                    placeholder="Amount in wei"
-                    value={form.value}
-                    onChange={set("value")}
-                    min="1"
-                    required
+                    type="number" placeholder="Amount in wei"
+                    value={form.value} onChange={set("value")} min="1" required
                   />
                   <span className={styles.inputUnit}>wei</span>
                 </div>
-                {ethPreview && (
-                  <p className={styles.conversion}>≈ {ethPreview} ETH</p>
-                )}
+                {ethPreview && <p className={styles.conversion}>≈ {ethPreview} ETH</p>}
               </div>
 
               {/* Recipient */}
               <div className={styles.field}>
                 <label className={styles.label}>
-                  <MapPin size={14} />
-                  Recipient Address <span className={styles.req}>*</span>
+                  <MapPin size={14}/> Recipient Address <span className={styles.req}>*</span>
                 </label>
                 <input
-                  className={`${styles.input} ${recipientInvalid ? styles.inputError : ""} ${form.recipient && recipientValid && isValidAddress(form.recipient) ? styles.inputValid : ""}`}
-                  type="text"
-                  placeholder="0x..."
-                  value={form.recipient}
-                  onChange={set("recipient")}
-                  required
+                  className={`${styles.input}
+                    ${recipientInvalid ? styles.inputError : ""}
+                    ${recipientOk      ? styles.inputValid : ""}`}
+                  type="text" placeholder="0x…"
+                  value={form.recipient} onChange={set("recipient")} required
                 />
                 {recipientInvalid && (
                   <p className={styles.fieldError}>
-                    <AlertCircle size={12} /> Invalid Ethereum address format
+                    <AlertCircle size={12}/> Invalid Ethereum address format
                   </p>
                 )}
-                {form.recipient && isValidAddress(form.recipient) && (
+                {recipientOk && (
                   <p className={styles.fieldSuccess}>
-                    <CheckCircle2 size={12} /> Valid Ethereum address
+                    <CheckCircle2 size={12}/> Valid Ethereum address
                   </p>
                 )}
                 <p className={styles.helpText}>
@@ -151,10 +189,27 @@ export default function NewRequestPage() {
                 </p>
               </div>
 
+              {/* Proof link */}
+              <div className={styles.field}>
+                <label className={styles.label}>
+                  <LinkIcon size={14}/> Supporting Link
+                  <span className={styles.optional}>(optional)</span>
+                </label>
+                <input
+                  className={styles.input}
+                  type="url"
+                  placeholder="https://invoice.com/… or drive link, quote, contract…"
+                  value={form.proofLink} onChange={set("proofLink")}
+                />
+                <p className={styles.helpText}>
+                  Add an invoice, quote, contract, or any supporting document URL. Shown as a clickable link on the request card — builds trust with voters.
+                </p>
+              </div>
+
               {/* Error */}
               {error && (
                 <div className={styles.errorBox}>
-                  <AlertCircle size={16} className={styles.errorIcon} />
+                  <AlertCircle size={16} className={styles.errorIcon}/>
                   <div>
                     <p className={styles.errorTitle}>Transaction Failed</p>
                     <p className={styles.errorMsg}>{error}</p>
@@ -165,31 +220,23 @@ export default function NewRequestPage() {
               {/* Success */}
               {success && (
                 <div className={styles.successBox}>
-                  <CheckCircle2 size={16} />
-                  <p>Request created! Redirecting to requests…</p>
+                  <CheckCircle2 size={16}/>
+                  <p>Request created! Redirecting…</p>
                 </div>
               )}
 
               {/* Actions */}
               <div className={styles.actions}>
-                <button
-                  type="button"
-                  className={styles.cancelBtn}
+                <button type="button" className={styles.cancelBtn}
                   onClick={() => router.push(`/campaigns/${address}/requests`)}
-                  disabled={loading}
-                >
+                  disabled={loading}>
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className={styles.submitBtn}
-                  disabled={loading || !isValid}
-                >
-                  {loading ? (
-                    <><Loader2 size={16} className={styles.spinner} /> Submitting…</>
-                  ) : (
-                    <>Submit Request <ChevronRight size={16} /></>
-                  )}
+                <button type="submit" className={styles.submitBtn}
+                  disabled={loading || !isValid}>
+                  {loading
+                    ? <><Loader2 size={16} className={styles.spinner}/> Submitting…</>
+                    : <>Submit Request <ChevronRight size={16}/></>}
                 </button>
               </div>
 
@@ -202,46 +249,31 @@ export default function NewRequestPage() {
             {/* Governance flow */}
             <div className={styles.infoCard}>
               <div className={styles.infoHeader}>
-                <Info size={15} className={styles.infoIcon} />
+                <Info size={15} className={styles.infoIcon}/>
                 <h3 className={styles.infoTitle}>Governance flow</h3>
               </div>
               <ol className={styles.stepList}>
-                <li>
-                  <div className={styles.stepIcon} style={{background:"#EEF2FF",color:"#4F46E5"}}>
-                    <AlignLeft size={14} />
-                  </div>
-                  <div>
-                    <strong>You submit this request</strong>
-                    <p>Recorded on-chain immediately.</p>
-                  </div>
-                </li>
-                <li>
-                  <div className={styles.stepIcon} style={{background:"#FFF7ED",color:"#EA580C"}}>
-                    <Users size={14} />
-                  </div>
-                  <div>
-                    <strong>Contributors vote</strong>
-                    <p>Each contributor gets one vote per request.</p>
-                  </div>
-                </li>
-                <li>
-                  <div className={styles.stepIcon} style={{background:"#ECFDF5",color:"#059669"}}>
-                    <ShieldCheck size={14} />
-                  </div>
-                  <div>
-                    <strong>Majority reached (&gt;50%)</strong>
-                    <p>Request becomes eligible for finalization.</p>
-                  </div>
-                </li>
-                <li>
-                  <div className={styles.stepIcon} style={{background:"#F0F9FF",color:"#0284C7"}}>
-                    <Rocket size={14} />
-                  </div>
-                  <div>
-                    <strong>You finalize</strong>
-                    <p>ETH transfers directly to the recipient address.</p>
-                  </div>
-                </li>
+                {[
+                  { icon: <AlignLeft size={14}/>, color: ["#EEF2FF","#4F46E5"],
+                    title: "You submit this request", desc: "Recorded on-chain with type, description, amount, recipient, and optional proof link." },
+                  { icon: <Users size={14}/>, color: ["#FFF7ED","#EA580C"],
+                    title: "Contributors vote", desc: "Each contributor gets one vote. They can review the proof link before approving." },
+                  { icon: <ShieldCheck size={14}/>, color: ["#ECFDF5","#059669"],
+                    title: "Majority reached (>50%)", desc: "Request becomes eligible for finalization once majority approves." },
+                  { icon: <Rocket size={14}/>, color: ["#F0F9FF","#0284C7"],
+                    title: "You finalize", desc: "ETH transfers directly and instantly to the recipient address." },
+                ].map((s, i) => (
+                  <li key={i}>
+                    <div className={styles.stepIcon}
+                      style={{ background: s.color[0], color: s.color[1] }}>
+                      {s.icon}
+                    </div>
+                    <div>
+                      <strong>{s.title}</strong>
+                      <p>{s.desc}</p>
+                    </div>
+                  </li>
+                ))}
               </ol>
             </div>
 
@@ -249,15 +281,15 @@ export default function NewRequestPage() {
             <div className={styles.tipCard}>
               <p className={styles.tipTitle}>💡 Tips for approval</p>
               <ul className={styles.tipList}>
-                <li>Be specific about what the funds will accomplish</li>
-                <li>Use a trusted recipient address you control</li>
-                <li>Only request what you need — large amounts get more scrutiny</li>
-                <li>Notify your contributors to vote after submitting</li>
+                <li>Pick the right request type — it helps voters understand intent</li>
+                <li>Be specific: "Buy 2x RTX 4080 GPUs for rendering" beats "Equipment purchase"</li>
+                <li>Always include a proof link — invoices and quotes build trust</li>
+                <li>Only request what you need — proportional requests get approved faster</li>
+                <li>Let contributors know to vote after submitting</li>
               </ul>
             </div>
 
           </div>
-
         </div>
       </div>
     </Layout>
