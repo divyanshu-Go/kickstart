@@ -1,191 +1,207 @@
+/* styles/Header.module.css */
+
+/* ─── Navbar shell ───────────────────────────────────────────────────────────── */
 .navbar {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
 }
 
 .container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 0 var(--space-6);
+  height: 100%;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  padding: 18px 32px;
+  gap: var(--space-6);
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-}
-
+/* ─── Logo ───────────────────────────────────────────────────────────────────── */
 .logoLink {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-2);
   text-decoration: none;
-  transition: all 0.3s ease;
-  padding: 8px 12px;
-  border-radius: 12px;
+  transition: opacity var(--transition);
 }
 
 .logoLink:hover {
-  background: rgba(102, 126, 234, 0.1);
-  transform: translateY(-2px);
+  opacity: 0.85;
 }
 
-.logoIcon {
-  font-size: 32px;
-  filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.5));
-  animation: pulse 3s ease-in-out infinite;
+.logoMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: var(--accent);
+  border-radius: var(--radius-md);
+  color: white;
+  flex-shrink: 0;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
+.logoMark svg {
+  width: 18px;
+  height: 18px;
 }
 
 .logoText {
-  font-size: 26px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
-.nav {
+.logoDot {
+  color: var(--accent);
+}
+
+/* ─── Network badge ──────────────────────────────────────────────────────────── */
+.networkBadge {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--success-light);
+  border: 1px solid #A7F3D0;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--success);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.networkDot {
+  width: 7px;
+  height: 7px;
+  background: var(--success);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* ─── Nav right ──────────────────────────────────────────────────────────────── */
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .navLink {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 20px;
-  border-radius: 10px;
-  color: rgba(255, 255, 255, 0.8);
+  gap: var(--space-2);
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
   text-decoration: none;
-  font-size: 15px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
+  transition: background var(--transition), color var(--transition);
 }
 
 .navLink:hover {
-  color: white;
-  background: rgba(102, 126, 234, 0.1);
-  border-color: rgba(102, 126, 234, 0.3);
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .navLink.active {
-  color: white;
-  background: rgba(102, 126, 234, 0.2);
-  border-color: rgba(102, 126, 234, 0.5);
+  background: var(--accent-light);
+  color: var(--accent);
 }
 
-.navIcon {
-  font-size: 18px;
-}
-
+/* ─── Create button ──────────────────────────────────────────────────────────── */
 .createButton {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  gap: var(--space-2);
+  padding: 8px 18px;
+  background: var(--accent);
   color: white;
-  padding: 10px 24px;
-  border-radius: 10px;
-  text-decoration: none;
-  font-size: 15px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
   font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-  border: 2px solid transparent;
+  letter-spacing: -0.01em;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 1px 3px rgba(79,70,229,0.3);
+  white-space: nowrap;
 }
 
 .createButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79,70,229,0.35);
 }
 
 .createButton:active {
   transform: translateY(0);
 }
 
-.createIcon {
-  font-size: 20px;
-  font-weight: 700;
+.plusIcon {
+  font-size: 1.1rem;
+  font-weight: 300;
   line-height: 1;
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 14px 20px;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  .logoText {
-    font-size: 22px;
-  }
-
-  .logoIcon {
-    font-size: 28px;
-  }
-
-  .nav {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .navLink {
-    flex: 1;
-    justify-content: center;
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-
-  .createButton {
-    flex: 1;
-    justify-content: center;
-    padding: 10px 16px;
-    font-size: 13px;
-  }
-
-  .navIcon,
-  .createIcon {
-    font-size: 16px;
-  }
+/* ─── Divider ────────────────────────────────────────────────────────────────── */
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  flex-shrink: 0;
 }
 
-@media (max-width: 480px) {
-  .logoLink {
-    padding: 4px 8px;
-  }
+/* ─── Wallet indicator ───────────────────────────────────────────────────────── */
+.walletBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  transition: border-color var(--transition), color var(--transition);
+  cursor: default;
+  font-family: var(--font-mono);
+}
 
-  .logoText {
-    font-size: 20px;
-  }
+.walletDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
+}
 
-  .logoIcon {
-    font-size: 24px;
-  }
+/* ─── Mobile (simple hide) ───────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .networkBadge { display: none; }
+  .navLink      { display: none; }
+  .divider      { display: none; }
+  .walletBtn    { display: none; }
 
-  .navLink {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
+  .container { padding: 0 var(--space-4); }
 
   .createButton {
-    padding: 8px 12px;
-    font-size: 12px;
+    padding: 7px 14px;
+    font-size: 0.85rem;
   }
 }
