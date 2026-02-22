@@ -205,3 +205,33 @@
     font-size: 0.85rem;
   }
 }
+
+/* ── Scroll shadow (appended) ───────────────────────────────────────────────── */
+.scrolled {
+  box-shadow: 0 1px 24px rgba(15,23,42,0.08);
+  border-bottom-color: var(--border);
+}
+
+/* ── Connect wallet button ───────────────────────────────────────────────────── */
+.connectBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1.5px solid var(--accent-mid);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-light);
+  transition: background var(--transition), border-color var(--transition),
+              color var(--transition), transform var(--transition);
+  white-space: nowrap;
+}
+
+.connectBtn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  transform: translateY(-1px);
+}

@@ -19,15 +19,31 @@ const input = {
     },
   },
   settings: {
+    optimizer: {
+      enabled: true,
+      runs: 200,
+    },
+    viaIR: true,
     outputSelection: {
       "*": {
-        "*": ["*"], // get all output for all contracts
+        "*": ["*"],
       },
     },
   },
 };
 
-const output = JSON.parse(solc.compile(JSON.stringify(input))).contracts["Campaign.sol"];
+
+const compiled = JSON.parse(solc.compile(JSON.stringify(input)));
+
+if (compiled.errors) {
+  console.log("COMPILER ERRORS:");
+  console.log(compiled.errors);
+}
+
+console.log("Compiled contracts keys:");
+console.log(Object.keys(compiled.contracts["Campaign.sol"]));
+
+const output = compiled.contracts["Campaign.sol"];
 
 fs.ensureDirSync(buildPath);
 
