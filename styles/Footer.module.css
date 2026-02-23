@@ -1,0 +1,158 @@
+/* styles/Footer.module.css */
+
+.footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-6) var(--space-8);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+}
+
+/* ── Brand ───────────────────────────────────────────────────────────────────── */
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.logoMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: var(--accent);
+  color: white;
+  border-radius: var(--radius-md);
+}
+
+.logoText {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.logoDot { color: var(--accent); }
+
+.tagline {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  max-width: 260px;
+}
+
+.network {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  width: fit-content;
+}
+
+.network::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/* ── Developer ───────────────────────────────────────────────────────────────── */
+.developer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-end;
+}
+
+.devLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.devName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* ── Socials ─────────────────────────────────────────────────────────────────── */
+.socials {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: var(--space-1);
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  background: var(--bg-surface);
+  transition: border-color var(--transition), color var(--transition),
+              background var(--transition), transform var(--transition);
+}
+
+.socialLink:hover {
+  border-color: var(--accent-mid);
+  color: var(--accent);
+  background: var(--accent-light);
+  transform: translateY(-1px);
+}
+
+/* ── Bottom bar ──────────────────────────────────────────────────────────────── */
+.bottom {
+  border-top: 1px solid var(--border);
+  padding: var(--space-4) var(--space-6);
+  text-align: center;
+}
+
+.bottom p {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .container  { flex-direction: column; gap: var(--space-6); padding: var(--space-8) var(--space-4); }
+  .developer  { align-items: flex-start; }
+  .socials    { justify-content: flex-start; }
+}
